@@ -133,9 +133,9 @@ namespace BezierCurveCalculator
 
             //First, divide the given control points into proper sets.
             List<List<PointF>> setsOfControlPoints = new List<List<PointF>>();
-            for(int i = 0; i < numControlPoints; i += 3)
-            {
-                List<PointF> controlPointsSet = new List<PointF>();
+            List<PointF> controlPointsSet = new List<PointF>();
+            for (int i = 0; i < numControlPoints; i += 3)
+            {                
                 for (int j = i; j <= i+3 && j < numControlPoints; j++)
                 {
                     controlPointsSet.Add(givenPoints[j]);
@@ -144,10 +144,14 @@ namespace BezierCurveCalculator
             }
             int distributedNumPointsToCalulate = (int)MathF.Ceiling(numPointsToCalulate / setsOfControlPoints.Count);
 
+            //We also add a (potential) couple extra points to the final curve, as there may be an improper amount of points to be return (due to the rounded division above) otherwise.
+            int compensationPoints = numPointsToCalulate - distributedNumPointsToCalulate;
+
             //Now, analyze each set, and combine all the control points together.            
             List<PointF> bezierCurveToReturn = new List<PointF>();
-            foreach (List<PointF> controlPointsSet in setsOfControlPoints)
+            for (int i = 0; i < setsOfControlPoints.Count - 1; i++)
             {
+                controlPointsSet = setsOfControlPoints[i];
                 switch (controlPointsSet.Count)
                 {
                     case 2:
@@ -158,9 +162,11 @@ namespace BezierCurveCalculator
                         break;
                     case 4:
                         bezierCurveToReturn.AddRange(calculate_bezier_curve_with_four_control_points(controlPointsSet, distributedNumPointsToCalulate));
-                        break;                                           
+                        break;
                 }
             }
+            controlPointsSet = setsOfControlPoints[setsOfControlPoints.Count - 1];
+            bezierCurveToReturn.AddRange(calculate_bezier_curve_with_four_control_points(controlPointsSet, distributedNumPointsToCalulate + compensationPoints));
 
             //Finally, return the combined Bezier curves.
             return bezierCurveToReturn;
