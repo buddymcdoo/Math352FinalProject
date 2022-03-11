@@ -6,6 +6,6 @@ public class berryRotate : MonoBehaviour
 {
     void Update()
     {
-        transform.eulerAngles -= Vector3.up;
+        transform.eulerAngles -= (Vector3.up * Time.deltaTime * 100.0f);
     }
 }
